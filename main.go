@@ -28,6 +28,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"github.com/suzuken/calc/lex"
 	"os"
 	"strings"
@@ -35,9 +36,15 @@ import (
 
 func main() {
 	buf := bufio.NewScanner(os.Stdin)
+	printHeader()
 	for buf.Scan() {
 		calc(buf.Text())
+		printHeader()
 	}
+}
+
+func printHeader() {
+	fmt.Print("(calc) > ")
 }
 
 func calc(line string) {

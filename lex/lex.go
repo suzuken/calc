@@ -1,3 +1,6 @@
+// lex is Lexer package of calculator.
+//
+// This package provides lexer for arithmetic expression. An evaluator is implementated as big.Rat wrapper.
 package lex
 
 import (
@@ -61,7 +64,7 @@ func String(r *big.Rat) string {
 
 // Print outputs evaluated rational.
 func Print(r *big.Rat) {
-	fmt.Printf("= %s\n", String(r))
+	fmt.Printf("=> %s\n", String(r))
 }
 
 // AddSubExp read summuation and subtraction
