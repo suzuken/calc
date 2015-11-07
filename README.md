@@ -2,6 +2,18 @@
 
 simple calculator written in Go.
 
+## Works like that
+
+	$ calc
+	(calc) > kuke
+	[ERROR] number expected. Given token is not number.: -2
+	(calc) > 1 + 2
+	=> 3
+	(calc) > 1 / 2 * 3 + 4 - 5
+	=> 1/2
+	(calc) > (2+4*3)/2
+	=> 7
+
 ## Installation
 
 	go get github.com/suzuken/calc

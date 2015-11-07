@@ -50,7 +50,10 @@ func Zero() *big.Rat {
 func Evaluate(lex *Lex) (*big.Rat, error) {
 	// after initialize lexer, step to first token.
 	lex.NextToken()
-	x := AddSubExp(lex)
+	x, err := AddSubExp(lex)
+	if err != nil {
+		return nil, err
+	}
 	if lex.Token != scanner.EOF {
 		return nil, errors.New("unexpected EOF")
 	}
@@ -68,7 +71,7 @@ func Print(r *big.Rat) {
 }
 
 // AddSubExp read summuation and subtraction
-func AddSubExp(lex *Lex) *big.Rat {
+func AddSubExp(lex *Lex) (*big.Rat, error) {
 	unaryMinus := false
 	switch lex.Token {
 	case '+':
@@ -78,7 +81,10 @@ func AddSubExp(lex *Lex) *big.Rat {
 		lex.NextToken()
 	}
 	// multiplication and division is prior than subtract and addition
-	x := MulDivExp(lex)
+	x, err := MulDivExp(lex)
+	if err != nil {
+		return nil, err
+	}
 	if unaryMinus {
 		x = x.Sub(Zero(), x)
 	}
@@ -87,63 +93,81 @@ LOOP:
 		switch lex.Token {
 		case '+':
 			lex.NextToken()
-			y := MulDivExp(lex)
+			y, err := MulDivExp(lex)
+			if err != nil {
+				return nil, err
+			}
 			x = y.Add(x, y)
 		case '-':
 			lex.NextToken()
-			y := MulDivExp(lex)
+			y, err := MulDivExp(lex)
+			if err != nil {
+				return nil, err
+			}
 			x = y.Sub(x, y)
 		default:
 			break LOOP
 		}
 	}
-	return x
+	return x, nil
 }
 
 // MulDivExp evaluate multiplication and division
-func MulDivExp(lex *Lex) *big.Rat {
-	x := UnaryExp(lex)
+func MulDivExp(lex *Lex) (*big.Rat, error) {
+	x, err := UnaryExp(lex)
+	if err != nil {
+		return nil, err
+	}
 LOOP:
 	for {
 		switch lex.Token {
 		case '*':
 			lex.NextToken()
-			y := UnaryExp(lex)
+			y, err := UnaryExp(lex)
+			if err != nil {
+				return nil, err
+			}
 			x = y.Mul(x, y)
 		case '/':
 			lex.NextToken()
-			y := UnaryExp(lex)
+			y, err := UnaryExp(lex)
+			if err != nil {
+				return nil, err
+			}
 			// zero division check is included
 			x = y.Quo(x, y)
 		default:
 			break LOOP
 		}
 	}
-	return x
+	return x, nil
 }
 
 // Unary evaluate unary expression
 // include () expression
-func UnaryExp(lex *Lex) *big.Rat {
+func UnaryExp(lex *Lex) (*big.Rat, error) {
 	if lex.Token == '(' {
 		lex.NextToken()
-		x := AddSubExp(lex)
+		x, err := AddSubExp(lex)
+		if err != nil {
+			return nil, err
+		}
 		if lex.Token != ')' {
-			panic(lex.Error("')' expected but not found. exit."))
+			return nil, lex.Error("')' expected but not found. exit.")
 		}
 		lex.NextToken()
-		return x
+		return x, nil
 	}
 	if lex.Token != scanner.Int && lex.Token != scanner.Float {
-		panic(lex.Error(fmt.Sprintf("number expected. Given token %v is not number.", lex.Token)))
+		return nil, lex.Error("number expected. Given token is not number.")
 	}
 
 	// found if string can represent as rational.
 	var r big.Rat
 	rat, ok := r.SetString(lex.Scanner.TokenText())
 	if !ok {
-		panic(lex.Error("invalid number"))
+		return nil, lex.Error("invalid number")
 	}
 	lex.NextToken()
-	return rat
+	return rat, nil
 }

@@ -47,6 +47,10 @@ func printHeader() {
 	fmt.Print("(calc) > ")
 }
 
+func printError(err error) {
+	fmt.Printf("[ERROR] %s\n", err)
+}
+
 func calc(line string) {
 	r := strings.NewReader(line)
 	l := lex.New()
@@ -54,7 +58,8 @@ func calc(line string) {
 
 	rat, err := lex.Evaluate(l)
 	if err != nil {
-		panic(err)
+		printError(err)
+	} else {
+		lex.Print(rat)
 	}
-	lex.Print(rat)
 }
