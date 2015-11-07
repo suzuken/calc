@@ -54,9 +54,14 @@ func Evaluate(lex *Lex) (*big.Rat, error) {
 	return x, nil
 }
 
+// String creates string of big.Rat. This is output format of calc.
+func String(r *big.Rat) string {
+	return r.RatString()
+}
+
 // Print outputs evaluated rational.
 func Print(r *big.Rat) {
-	fmt.Printf("= %s\n", r.RatString())
+	fmt.Printf("= %s\n", String(r))
 }
 
 // AddSubExp read summuation and subtraction
