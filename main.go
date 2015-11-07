@@ -4,13 +4,27 @@
 package main
 
 import (
+	"bufio"
 	"github.com/suzuken/calc/lex"
+	"os"
 	"strings"
 )
 
 func main() {
-	line := "hoge"
+	buf := bufio.NewScanner(os.Stdin)
+	for buf.Scan() {
+		calc(buf.Text())
+	}
+}
+
+func calc(line string) {
 	r := strings.NewReader(line)
 	l := lex.New()
 	l.Init(r)
+
+	rat, err := lex.Evaluate(l)
+	if err != nil {
+		panic(err)
+	}
+	lex.Print(rat)
 }

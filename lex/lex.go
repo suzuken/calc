@@ -1,6 +1,7 @@
 package lex
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"math/big"
@@ -34,12 +35,28 @@ func (lex *Lex) NextToken() {
 
 // Error creates error including current token context.
 func (lex *Lex) Error(msg string) error {
-	return fmt.Errorf("%s: %q", msg, lex.Token)
+	return fmt.Errorf("%s: %v", msg, lex.Token)
 }
 
 // Zero returns 0 value of big.Rat
 func Zero() *big.Rat {
 	return big.NewRat(0, 0)
+}
+
+// Evaluate use lexer and evaluate its value.
+func Evaluate(lex *Lex) (*big.Rat, error) {
+	// after initialize lexer, step to first token.
+	lex.NextToken()
+	x := AddSubExp(lex)
+	if lex.Token != scanner.EOF {
+		return nil, errors.New("unexpected EOF")
+	}
+	return x, nil
+}
+
+// Print outputs evaluated rational.
+func Print(r *big.Rat) {
+	fmt.Printf("= %s\n", r.RatString())
 }
 
 // AddSubExp read summuation and subtraction
@@ -115,7 +132,7 @@ func UnaryExp(lex *Lex) *big.Rat {
 
 	// found if string can represent as rational.
 	var r big.Rat
-	rat, ok := r.SetString(string(lex.Token))
+	rat, ok := r.SetString(lex.Scanner.TokenText())
 	if !ok {
 		panic(lex.Error("invalid number"))
 	}
