@@ -2,6 +2,10 @@
 
 simple calculator written in Go.
 
+## Installation
+
+	go get github.com/suzuken/calc
+
 ## LICENSE
 
 MIT (based on original license)
